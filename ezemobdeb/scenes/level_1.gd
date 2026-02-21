@@ -9,39 +9,17 @@ var dash_direction = 1.0
 const DEATH_Y = 1000.0
 var spawn_position: Vector2
 @export var death_ui: Control
-@export var win_ui: Control
 @export var platform_spawner: Node
-@export var portal: Area2D
 
 func _ready() -> void:
 	spawn_position = position
 	if death_ui == null:
 		print("❌ death_ui NOT assigned!")
 	else:
+		print("✅ death_ui assigned")
 		death_ui.visible = false
 		var button = death_ui.get_node("Button")
 		button.pressed.connect(_on_button_pressed)
-	if win_ui == null:
-		print("❌ win_ui NOT assigned!")
-	else:
-		win_ui.visible = false
-		var button = win_ui.get_node("Button")
-		button.pressed.connect(_on_button_pressed)
-	if portal:
-		portal.body_entered.connect(_on_portal_entered)
-
-func _on_portal_entered(body: Node) -> void:
-	if body == self:
-		win()
-
-func win() -> void:
-	print("🏆 Level complete!")
-	set_physics_process(false)
-	velocity = Vector2.ZERO
-	if platform_spawner:
-		platform_spawner.stop_all()
-	if win_ui:
-		win_ui.visible = true
 
 func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("dash") and not is_dashing:
@@ -77,7 +55,10 @@ func check_death() -> void:
 
 func die() -> void:
 	print("💀 Player died at Y =", position.y)
-	if death_ui:
+	if death_ui == null:
+		print("❌ death_ui is NULL (NOT CONNECTED IN INSPECTOR)")
+	else:
+		print("✅ Showing death UI")
 		death_ui.visible = true
 	if platform_spawner:
 		platform_spawner.stop_all()
@@ -88,8 +69,6 @@ func restart() -> void:
 	print("🔄 Restarting...")
 	if death_ui:
 		death_ui.visible = false
-	if win_ui:
-		win_ui.visible = false
 	if platform_spawner:
 		platform_spawner.restart_all()
 	position = spawn_position

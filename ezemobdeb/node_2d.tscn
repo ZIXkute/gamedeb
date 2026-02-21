@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://c3sbhobodpx5y"]
+[gd_scene load_steps=9 format=3 uid="uid://c3sbhobodpx5y"]
 
 [ext_resource type="Texture2D" uid="uid://dnxeajq8pnyf3" path="res://sky.jpg" id="1_epypp"]
 [ext_resource type="PackedScene" uid="uid://kxcfco5gqa5i" path="res://scenes/main.tscn" id="3_q6r6c"]
@@ -7,7 +7,13 @@
 [ext_resource type="PackedScene" uid="uid://cr5vtpx5xng27" path="res://platform.tscn" id="6_d21ai"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q6r6c"]
-size = Vector2(655, 119)
+size = Vector2(1043.7813, 119)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kdubu"]
+size = Vector2(1131, 126)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_q6r6c"]
+radius = 56.22277
 
 [node name="Node2D" type="Node2D"]
 
@@ -22,9 +28,13 @@ size_flags_vertical = 3
 texture = ExtResource("1_epypp")
 expand_mode = 1
 
-[node name="CharacterBody2D" parent="." node_paths=PackedStringArray("death_ui") instance=ExtResource("3_q6r6c")]
+[node name="CharacterBody2D" parent="." node_paths=PackedStringArray("death_ui", "win_ui", "portal") instance=ExtResource("3_q6r6c")]
 position = Vector2(336, 310)
 death_ui = NodePath("../CanvasLayer/DeadUI(Control)")
+win_ui = NodePath("../WinUI/Control")
+portal = NodePath("../Portal")
+
+[node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
 
 [node name="TextEdit" type="TextEdit" parent="."]
 offset_left = 173.0
@@ -81,16 +91,28 @@ icon_alignment = 1
 expand_icon = true
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2(326, 866)
+position = Vector2(312, 1377)
 
 [node name="Sprite2D" type="Sprite2D" parent="StaticBody2D"]
-position = Vector2(-11.999985, -82)
-scale = Vector2(5.2539063, 1)
+position = Vector2(189.09375, -564)
+scale = Vector2(8.311034, 1)
 texture = ExtResource("4_0hol4")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-position = Vector2(-4, -88)
+position = Vector2(201.10938, -563)
 shape = SubResource("RectangleShape2D_q6r6c")
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+position = Vector2(2287, 454)
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D2"]
+position = Vector2(-297.2968, 12.5)
+scale = Vector2(8.885985, 0.8046875)
+texture = ExtResource("4_0hol4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+position = Vector2(-297.5, 23)
+shape = SubResource("RectangleShape2D_kdubu")
 
 [node name="PlatformSpawn" type="Node" parent="."]
 script = ExtResource("5_kdubu")
@@ -101,6 +123,40 @@ wait_time = 2.0
 autostart = true
 
 [node name="Marker2D" type="Marker2D" parent="PlatformSpawn"]
-position = Vector2(2170, 709)
+position = Vector2(2602, 726)
+
+[node name="Portal" type="Area2D" parent="."]
+position = Vector2(2501, 358)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Portal"]
+shape = SubResource("CircleShape2D_q6r6c")
+
+[node name="Sprite2D" type="Sprite2D" parent="Portal"]
+scale = Vector2(0.7578125, 0.75)
+texture = ExtResource("4_0hol4")
+
+[node name="WinUI" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="WinUI"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 302.0
+offset_top = 182.0
+offset_right = 342.0
+offset_bottom = 222.0
+
+[node name="Label" type="Label" parent="WinUI/Control"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Level Complete"
+
+[node name="Button" type="Button" parent="WinUI/Control"]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 37.0
+offset_right = 90.0
+offset_bottom = 68.0
+text = "Restart"
 
 [connection signal="timeout" from="PlatformSpawn/Timer" to="PlatformSpawn" method="_on_timer_timeout"]
