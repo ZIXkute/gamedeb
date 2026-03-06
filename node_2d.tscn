@@ -2326,14 +2326,24 @@ size_flags_vertical = 3
 texture = ExtResource("1_kdubu")
 expand_mode = 1
 
-[node name="CharacterBody2D" parent="." node_paths=PackedStringArray("death_ui", "win_ui", "portal") instance=ExtResource("3_q6r6c")]
+[node name="CharacterBody2D" parent="." node_paths=PackedStringArray("death_ui", "win_ui", "portal", "health_label") instance=ExtResource("3_q6r6c")]
 position = Vector2(336, 310)
 death_enabled = false
 death_ui = NodePath("../CanvasLayer/DeadUI(Control)")
 win_ui = NodePath("../WinUI/Control")
 portal = NodePath("../Portal")
+health_label = NodePath("CanvasLayer/Label")
 
 [node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="CharacterBody2D"]
+
+[node name="Label" type="Label" parent="CharacterBody2D/CanvasLayer"]
+offset_left = 243.0
+offset_top = 218.0
+offset_right = 298.0
+offset_bottom = 241.0
+text = "HP: 5"
 
 [node name="TextEdit" type="TextEdit" parent="."]
 offset_left = 173.0
@@ -2410,7 +2420,7 @@ position = Vector2(1744, 601)
 position = Vector2(-495, 691)
 shape = SubResource("RectangleShape2D_d21ai")
 
-[node name="Portal" type="Area2D" parent="."]
+[node name="Portal" type="Area2D" parent="." groups=["portal"]]
 position = Vector2(2173, 180)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Portal"]
@@ -2602,3 +2612,6 @@ shape = SubResource("SegmentShape2D_nr8wp")
 [node name="Enemy" parent="." instance=ExtResource("4_0hol4")]
 position = Vector2(1288, 1198)
 scale = Vector2(2, 2)
+
+[node name="Enemy2" parent="." instance=ExtResource("4_0hol4")]
+position = Vector2(1930, 936)

@@ -1,31 +1,47 @@
 extends CharacterBody2D
 const SPEED = 300.0
-const JUMP_VELOCITY = -600.0
+const JUMP_VELOCITY = -800.0
 const DASH_SPEED = 800.0
 const DASH_DURATION = 0.2
+const FALL_GRAVITY_MULTIPLIER = 2.5
+const RISE_GRAVITY_MULTIPLIER = 1.8
 var is_dashing = false
 var dash_timer = 0.0
 var dash_direction = 1.0
 const DEATH_Y = 1000.0
 var spawn_position: Vector2
-var health = 20
-const MAX_HEALTH = 20
+var health = 5
+const MAX_HEALTH = 5
 @export var death_enabled: bool = true
 @export var death_ui: Control
 @export var win_ui: Control
 @export var platform_spawner: Node
 @export var portal: Area2D
 @export var attack_area: Area2D
+@export var health_label: Label
 
 func take_damage(amount: int) -> void:
 	health -= amount
 	print("❤️ Player health:", health)
+	if health_label:
+		health_label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
 	if health <= 0:
 		die()
+
+func heal_full() -> void:
+	health = MAX_HEALTH
+	if health_label:
+		health_label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
 
 func _ready() -> void:
 	add_to_group("player")
 	spawn_position = position
+	# Hide portal at start
+	var portal_node = get_tree().get_first_node_in_group("portal")
+	if portal_node:
+		portal_node.visible = false
+	if health_label:
+		health_label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
 	if death_ui == null:
 		print("❌ death_ui NOT assigned!")
 	else:
@@ -65,7 +81,6 @@ func win() -> void:
 	get_tree().change_scene_to_file("res://level_2.tscn")
 
 func _physics_process(delta: float) -> void:
-	# Flip attack area with player direction
 	if attack_area:
 		attack_area.scale.x = -1 if $Sprite2D.flip_h else 1
 
@@ -73,11 +88,9 @@ func _physics_process(delta: float) -> void:
 		$Sprite2D.play("atak")
 		$Sprite2D.scale = Vector2(0.2, 0.2)
 		if attack_area:
-			print("Attack area monitoring:", attack_area.monitoring)
-			print("Attack area mask:", attack_area.collision_mask)
-			print("Overlapping bodies:", attack_area.get_overlapping_bodies())
 			for body in attack_area.get_overlapping_bodies():
-				print("🎯 Hit:", body.name)
+				if body == self:
+					continue
 				if body.has_method("take_damage"):
 					body.take_damage(1)
 
@@ -100,7 +113,16 @@ func _physics_process(delta: float) -> void:
 
 	if not is_dashing:
 		if not is_on_floor():
-			velocity += get_gravity() * delta
+			if velocity.y > 0:
+				velocity += get_gravity() * delta * FALL_GRAVITY_MULTIPLIER
+			else:
+				velocity += get_gravity() * delta * RISE_GRAVITY_MULTIPLIER
+			if velocity.y < 0:
+				if $Sprite2D.animation != "jump":
+					$Sprite2D.play("jump")
+			else:
+				if $Sprite2D.animation != "fall":
+					$Sprite2D.play("fall")
 
 		if Input.is_action_just_pressed("ui_up") and is_on_floor():
 			velocity.y = JUMP_VELOCITY
@@ -113,11 +135,11 @@ func _physics_process(delta: float) -> void:
 			velocity.x = direction * SPEED
 			dash_direction = direction
 			$Sprite2D.flip_h = direction < 0
-			if $Sprite2D.animation != "atak":
+			if is_on_floor() and $Sprite2D.animation != "atak":
 				$Sprite2D.play("run")
 		else:
 			velocity.x = move_toward(velocity.x, 0, SPEED)
-			if $Sprite2D.animation != "atak":
+			if is_on_floor() and $Sprite2D.animation != "atak":
 				$Sprite2D.play("afk")
 
 	move_and_slide()
@@ -141,6 +163,8 @@ func die() -> void:
 func restart() -> void:
 	print("🔄 Restarting...")
 	health = MAX_HEALTH
+	if health_label:
+		health_label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
 	if death_ui:
 		death_ui.visible = false
 	if win_ui:

@@ -2270,9 +2270,9 @@ sources/0 = SubResource("TileSetAtlasSource_7j8ne")
 [node name="TextureRect" type="TextureRect" parent="."]
 texture_filter = 1
 offset_left = 4.0
-offset_top = 13.0
-offset_right = 2552.0
-offset_bottom = 1425.0
+offset_top = -231.0
+offset_right = 7449.0
+offset_bottom = 1573.0
 size_flags_horizontal = 2
 size_flags_vertical = 3
 texture = ExtResource("1_n7ypv")

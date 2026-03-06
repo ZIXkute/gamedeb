@@ -73,7 +73,7 @@ animations = [{
 size = Vector2(21, 26)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jyhfs"]
-size = Vector2(133.125, 76.25)
+size = Vector2(82, 76.25)
 
 [node name="CharacterBody2D" type="CharacterBody2D" node_paths=PackedStringArray("attack_area")]
 position = Vector2(10, -40)
@@ -93,5 +93,5 @@ shape = SubResource("RectangleShape2D_0wfyh")
 [node name="AttackArea" type="Area2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2(29.104166, 1.3333359)
+position = Vector2(54.666668, 1.3333359)
 shape = SubResource("RectangleShape2D_jyhfs")
