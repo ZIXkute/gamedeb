@@ -1,47 +1,45 @@
 extends CharacterBody2D
 const SPEED = 300.0
-const JUMP_VELOCITY = -800.0
+const JUMP_VELOCITY = -750.0
 const DASH_SPEED = 800.0
 const DASH_DURATION = 0.2
 const FALL_GRAVITY_MULTIPLIER = 2.5
 const RISE_GRAVITY_MULTIPLIER = 1.8
 var is_dashing = false
+var is_attacking = false
 var dash_timer = 0.0
 var dash_direction = 1.0
 const DEATH_Y = 1000.0
 var spawn_position: Vector2
 var health = 5
 const MAX_HEALTH = 5
+const DASH_COOLDOWN = 1.0
+var dash_cooldown_timer = 0.0
 @export var death_enabled: bool = true
 @export var death_ui: Control
 @export var win_ui: Control
 @export var platform_spawner: Node
 @export var portal: Area2D
 @export var attack_area: Area2D
-@export var health_label: Label
 
 func take_damage(amount: int) -> void:
 	health -= amount
 	print("❤️ Player health:", health)
-	if health_label:
-		health_label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
+	$Label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
 	if health <= 0:
 		die()
 
 func heal_full() -> void:
 	health = MAX_HEALTH
-	if health_label:
-		health_label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
+	$Label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
 
 func _ready() -> void:
 	add_to_group("player")
 	spawn_position = position
-	# Hide portal at start
 	var portal_node = get_tree().get_first_node_in_group("portal")
 	if portal_node:
 		portal_node.visible = false
-	if health_label:
-		health_label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
+	$Label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
 	if death_ui == null:
 		print("❌ death_ui NOT assigned!")
 	else:
@@ -62,11 +60,9 @@ func _ready() -> void:
 
 func _on_animation_finished() -> void:
 	if $Sprite2D.animation == "atak":
-		if Input.is_action_pressed("attack"):
-			$Sprite2D.play("atak")
-		else:
-			$Sprite2D.play("afk")
-			$Sprite2D.scale = Vector2(0.29, 0.30)
+		is_attacking = false
+		$Sprite2D.play("afk")
+		$Sprite2D.scale = Vector2(0.29, 0.30)
 
 func _on_portal_entered(body: Node) -> void:
 	if body == self:
@@ -84,7 +80,8 @@ func _physics_process(delta: float) -> void:
 	if attack_area:
 		attack_area.scale.x = -1 if $Sprite2D.flip_h else 1
 
-	if Input.is_action_just_pressed("attack"):
+	if Input.is_action_just_pressed("attack") and not is_attacking:
+		is_attacking = true
 		$Sprite2D.play("atak")
 		$Sprite2D.scale = Vector2(0.2, 0.2)
 		if attack_area:
@@ -94,14 +91,13 @@ func _physics_process(delta: float) -> void:
 				if body.has_method("take_damage"):
 					body.take_damage(1)
 
-	if Input.is_action_just_released("attack"):
-		$Sprite2D.stop()
-		$Sprite2D.play("afk")
-		$Sprite2D.scale = Vector2(0.29, 0.30)
+	if dash_cooldown_timer > 0:
+		dash_cooldown_timer -= delta
 
-	if Input.is_action_just_pressed("dash") and not is_dashing:
+	if Input.is_action_just_pressed("dash") and not is_dashing and dash_cooldown_timer <= 0:
 		is_dashing = true
 		dash_timer = DASH_DURATION
+		dash_cooldown_timer = DASH_COOLDOWN
 		var direction := Input.get_axis("ui_left", "ui_right")
 		dash_direction = direction if direction != 0 else dash_direction
 
@@ -135,11 +131,11 @@ func _physics_process(delta: float) -> void:
 			velocity.x = direction * SPEED
 			dash_direction = direction
 			$Sprite2D.flip_h = direction < 0
-			if is_on_floor() and $Sprite2D.animation != "atak":
+			if is_on_floor() and not is_attacking:
 				$Sprite2D.play("run")
 		else:
 			velocity.x = move_toward(velocity.x, 0, SPEED)
-			if is_on_floor() and $Sprite2D.animation != "atak":
+			if is_on_floor() and not is_attacking:
 				$Sprite2D.play("afk")
 
 	move_and_slide()
@@ -163,14 +159,17 @@ func die() -> void:
 func restart() -> void:
 	print("🔄 Restarting...")
 	health = MAX_HEALTH
-	if health_label:
-		health_label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
+	is_attacking = false
+	$Label.text = "HP: " + str(health) + "/" + str(MAX_HEALTH)
 	if death_ui:
 		death_ui.visible = false
 	if win_ui:
 		win_ui.visible = false
 	if platform_spawner:
 		platform_spawner.restart_all()
+	var portal_node = get_tree().get_first_node_in_group("portal")
+	if portal_node:
+		portal_node.visible = false
 	position = spawn_position
 	velocity = Vector2.ZERO
 	set_physics_process(true)

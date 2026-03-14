@@ -2315,6 +2315,11 @@ b = Vector2(321, 4)
 
 [node name="Node2D" type="Node2D"]
 
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(1268, 716.00006)
+scale = Vector2(3, 3)
+zoom = Vector2(0.76, 0.76)
+
 [node name="TextureRect" type="TextureRect" parent="."]
 texture_filter = 1
 offset_left = 4.0
@@ -2332,18 +2337,9 @@ death_enabled = false
 death_ui = NodePath("../CanvasLayer/DeadUI(Control)")
 win_ui = NodePath("../WinUI/Control")
 portal = NodePath("../Portal")
-health_label = NodePath("CanvasLayer/Label")
-
-[node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
+health_label = NodePath("")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="CharacterBody2D"]
-
-[node name="Label" type="Label" parent="CharacterBody2D/CanvasLayer"]
-offset_left = 243.0
-offset_top = 218.0
-offset_right = 298.0
-offset_bottom = 241.0
-text = "HP: 5"
 
 [node name="TextEdit" type="TextEdit" parent="."]
 offset_left = 173.0

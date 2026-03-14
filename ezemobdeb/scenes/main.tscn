@@ -31,7 +31,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("1_o5qli")
 }],
-"loop": true,
+"loop": false,
 "name": &"afk",
 "speed": 5.0
 }, {
@@ -45,7 +45,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_tipki")
 }],
-"loop": true,
+"loop": false,
 "name": &"atak",
 "speed": 5.0
 }, {
@@ -53,7 +53,7 @@ animations = [{
 "duration": 1.0,
 "texture": ExtResource("1_o5qli")
 }],
-"loop": true,
+"loop": false,
 "name": &"default",
 "speed": 5.0
 }, {
@@ -84,7 +84,7 @@ attack_area = NodePath("AttackArea")
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 scale = Vector2(0.2953214, 0.3062678)
 sprite_frames = SubResource("SpriteFrames_0wfyh")
-animation = &"atak"
+animation = &"afk"
 autoplay = "run"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -95,3 +95,11 @@ shape = SubResource("RectangleShape2D_0wfyh")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
 position = Vector2(54.666668, 1.3333359)
 shape = SubResource("RectangleShape2D_jyhfs")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -9.333334
+offset_top = -49.666668
+offset_right = 30.666666
+offset_bottom = -19.666668
+scale = Vector2(0.5, 0.5)
+text = "HP: 5"
