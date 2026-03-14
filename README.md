@@ -9,3 +9,6 @@ level 2
 
 menu
 <img width="1200" height="675" alt="image" src="https://github.com/user-attachments/assets/32d53c94-d766-4eab-9c16-64bbbe7cc3e4" />
+
+phone
+![image alt](https://github.com/ZIXkute/gamedeb/blob/465c27dc15f9d2489bb12886b05713fb174d634b/image.png)
